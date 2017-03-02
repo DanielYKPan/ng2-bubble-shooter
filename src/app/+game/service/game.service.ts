@@ -4,8 +4,10 @@
 
 import { Injectable } from '@angular/core';
 import { Bubble, Color } from './bubble';
+import { Store } from '@ngrx/store';
+import { STORE_BUBBLES } from './actions.const';
 
-const GameStatic = {
+export const GameStatic = {
     columns: 15,    // Number of tile columns
     rows: 14,       // Number of tile rows
     bubbleWidth: 40,  // Visual width of a bubble
@@ -23,10 +25,10 @@ const randRange = ( low: number, high: number ): number => {
 @Injectable()
 export class GameService {
 
-    constructor() {
+    constructor( private store: Store<any> ) {
     }
 
-    buildGrid() {
+    public buildGrid(): void {
         let bubbles: Bubble[] = [];
         for (let j = 0; j < GameStatic.rows / 2; j++) {
             let randomColor = randRange(0, GameStatic.bubbleColors - 1);
@@ -46,5 +48,6 @@ export class GameService {
                 bubbles.push(bubble);
             }
         }
+        this.store.dispatch({type: STORE_BUBBLES, payload: {bubbles}});
     }
 }

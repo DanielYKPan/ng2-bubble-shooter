@@ -10,7 +10,7 @@ export const bubblesReducer: ActionReducer<Bubble[]> = ( state: Bubble[] = [], a
 
     switch (action.type) {
         case STORE_BUBBLES:
-            return Object.assign([], action.payload.tiles);
+            return Object.assign([], action.payload.bubbles);
 
         default:
             return state;
