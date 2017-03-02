@@ -3,6 +3,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { GameService } from './service';
 
 @Component({
     selector: 'app-game',
@@ -10,9 +11,10 @@ import { Component, OnInit } from '@angular/core';
     styleUrls: ['./game.component.scss'],
 })
 export class GameComponent implements OnInit {
-    constructor() {
+    constructor( private gameService: GameService ) {
     }
 
     public ngOnInit() {
+        this.gameService.buildGrid();
     }
 }

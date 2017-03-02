@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
 
 import { routes } from './game.routes';
 import { GameComponent } from './game.component';
+import { GameService } from './service';
 
 @NgModule({
     declarations: [
@@ -19,6 +20,9 @@ import { GameComponent } from './game.component';
         CommonModule,
         FormsModule,
         RouterModule.forChild(routes),
+    ],
+    providers: [
+        GameService
     ],
 })
 export class GameModule {
