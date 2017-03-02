@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
 
 import { routes } from './game.routes';
 import { GameComponent } from './game.component';
-import { GameService, bubblesReducer } from './service';
+import { GameService, bubblesReducer, gameStateReducer } from './service';
 import { StoreModule } from '@ngrx/store';
 
 @NgModule({
@@ -23,6 +23,7 @@ import { StoreModule } from '@ngrx/store';
         RouterModule.forChild(routes),
         StoreModule.provideStore({
             bubbles: bubblesReducer,
+            gameState: gameStateReducer,
         }),
     ],
     providers: [
