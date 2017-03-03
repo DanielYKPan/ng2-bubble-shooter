@@ -5,7 +5,7 @@
 import { Injectable } from '@angular/core';
 import { Bubble, Color } from './bubble';
 import { Store } from '@ngrx/store';
-import { STORE_BUBBLES } from './actions.const';
+import { STORE_BUBBLES, SET_GAME_STATE } from './actions.const';
 
 export const GameStatic = {
     columns: 15,    // Number of tile columns
@@ -28,7 +28,12 @@ export class GameService {
     constructor( private store: Store<any> ) {
     }
 
-    public buildGrid(): void {
+    public newGame(): void {
+        this.buildGrid();
+        this.initShootBubbles();
+    }
+
+    private buildGrid(): void {
         let bubbles: Bubble[] = [];
         for (let j = 0; j < GameStatic.rows / 2; j++) {
             let randomColor = randRange(0, GameStatic.bubbleColors - 1);
@@ -49,5 +54,11 @@ export class GameService {
             }
         }
         this.store.dispatch({type: STORE_BUBBLES, payload: {bubbles}});
+    }
+
+    private initShootBubbles(): void {
+        let bubble = new Bubble(null, null, randRange(0, GameStatic.bubbleColors - 1));
+        let nextBubble = new Bubble(null, null, randRange(0, GameStatic.bubbleColors - 1));
+        this.store.dispatch({type: SET_GAME_STATE, payload: {bubble, nextBubble}});
     }
 }

@@ -27,7 +27,7 @@ export class GameComponent implements OnInit {
 
     public ngOnInit() {
         this.bubbles$ = this.store.select('bubbles');
-        this.gameService.buildGrid();
+        this.gameService.newGame();
         this.bubbleWidth = GameStatic.bubbleWidth;
         this.bubbleHeight = GameStatic.bubbleHeight;
         this.rowHeight = GameStatic.rowHeight;
