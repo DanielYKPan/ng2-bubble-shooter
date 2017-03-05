@@ -8,6 +8,8 @@ import { Store } from '@ngrx/store';
 import { STORE_BUBBLES, SET_GAME_STATE } from './actions.const';
 
 export const GameStatic = {
+    x: 4,           // X position
+    y: 83,          // Y position
     columns: 15,    // Number of tile columns
     rows: 14,       // Number of tile rows
     bubbleWidth: 40,  // Visual width of a bubble
