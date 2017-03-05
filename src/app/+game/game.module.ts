@@ -10,11 +10,13 @@ import { routes } from './game.routes';
 import { GameComponent } from './game.component';
 import { GameService, bubblesReducer, gameStateReducer } from './service';
 import { StoreModule } from '@ngrx/store';
+import { GameBoardComponent } from './game-board';
 
 @NgModule({
     declarations: [
         // Components / Directives/ Pipes
         GameComponent,
+        GameBoardComponent,
     ],
     imports: [
         CommonModule,

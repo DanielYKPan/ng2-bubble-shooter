@@ -1,9 +1,3 @@
 <div class="game-wrapper">
-    <div class="game-board">
-        <div class="bubble-board"
-             [ngStyle]="getBubbleBoardStyle()"></div>
-        <div class="bubble"
-             *ngFor="let bubble of bubbles$ | async"
-             [ngStyle]="getBubbleStyle(bubble)"></div>
-    </div>
+    <app-game-board></app-game-board>
 </div>
