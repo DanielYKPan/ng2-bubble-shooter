@@ -4,6 +4,7 @@
 
 import { Injectable } from '@angular/core';
 import { Bubble } from './bubble';
+import { Player } from './player';
 
 export const GameStatic = {
     x: 4,           // X position
@@ -25,6 +26,20 @@ const randRange = ( low: number, high: number ): number => {
 @Injectable()
 export class GameService {
 
+    /* Property gridWidth */
+    private gridWidth: number = GameStatic.bubbleWidth * GameStatic.columns + GameStatic.bubbleWidth / 2;
+
+    get GridWidth(): number {
+        return this.gridWidth
+    }
+
+    /* Property gridHeight */
+    private gridHeight: number = GameStatic.rowHeight * (GameStatic.rows - 1) + GameStatic.bubbleHeight;
+
+    get GridHeight(): number {
+        return this.gridHeight
+    }
+
     private bubbles: Bubble[][];
 
     get Bubbles(): Bubble[][] {
@@ -45,8 +60,15 @@ export class GameService {
         return this.bubbleImage;
     }
 
+    private player: Player;
+
+    get Player(): Player {
+        return this.player;
+    }
+
     constructor() {
         this.initBubbles();
+        this.initPlayer();
         this.images = this.loadImages(['bubble-sprites.png']);
         this.bubbleImage = this.images[0];
     }
@@ -104,6 +126,23 @@ export class GameService {
                 this.bubbles[i][j] = new Bubble(i, j);
             }
         }
+    }
+
+    private initPlayer(): void {
+        let x = GameStatic.x + this.gridWidth / 2;
+        let y = GameStatic.y + this.gridHeight + GameStatic.bubbleHeight / 2;
+
+        // set the player current bubble
+        let randomColor = randRange(0, GameStatic.bubbleColors - 1);
+        console.log(randomColor);
+        this.player = new Player(x, y, 90);
+        this.player.Bubble = new Bubble(x - GameStatic.bubbleWidth / 2, y - GameStatic.bubbleHeight / 2, randomColor);
+
+        // set the player next bubble
+        randomColor = randRange(0, GameStatic.bubbleColors - 1);
+        let nextX = x - 3 * GameStatic.bubbleWidth;
+        let nextY = y - GameStatic.bubbleHeight / 2;
+        this.player.NextBubble = new Bubble(nextX, nextY, randomColor);
     }
 
     private buildGrid(): void {

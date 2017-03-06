@@ -36,3 +36,8 @@ export function shuffle<T>( list: T[] ): T[] {
     }
     return list;
 }
+
+// Convert degrees to radians
+export function degToRad( angle: number ): number {
+    return angle * (Math.PI / 180);
+}

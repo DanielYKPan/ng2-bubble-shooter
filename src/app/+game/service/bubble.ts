@@ -52,6 +52,6 @@ export class Bubble {
         this.id = uuid();
         this.x = x;
         this.y = y;
-        this.color = color ? color : null;
+        this.color = color >= 0 ? color : null;
     }
 }

@@ -3,16 +3,13 @@
  */
 
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { GameService, GameStatic, Color } from '../service';
+import { GameService, GameStatic, Color, degToRad } from '../service';
 
 @Component({
     selector: 'app-game-board',
     templateUrl: 'game-board.component.html'
 })
 export class GameBoardComponent implements OnInit {
-
-    public gridWidth: number;
-    public gridHeight: number;
 
     private context: any;
     @ViewChild('board') private board: ElementRef;
@@ -23,8 +20,6 @@ export class GameBoardComponent implements OnInit {
     public ngOnInit() {
         this.context = this.board.nativeElement.getContext('2d');
         this.gameService.newGame();
-        this.gridWidth = GameStatic.bubbleWidth * GameStatic.columns + GameStatic.bubbleWidth / 2;
-        this.gridHeight = GameStatic.rowHeight * (GameStatic.rows - 1) + GameStatic.bubbleHeight;
         this.main(0);
     }
 
@@ -47,10 +42,20 @@ export class GameBoardComponent implements OnInit {
         let yOffset = GameStatic.bubbleHeight / 2;
         this.context.fillStyle = '#8c8c8c';
         this.context.fillRect(GameStatic.x - 4, GameStatic.y - 4,
-            this.gridWidth + 8, this.gridHeight + 4 - yOffset);
+            this.gameService.GridWidth + 8, this.gameService.GridHeight + 4 - yOffset);
 
         // Render Bubbles
         this.drawBubbles();
+
+        // Draw level bottom
+        this.context.fillStyle = "#656565";
+        this.context.fillRect(GameStatic.x - 4,
+            GameStatic.y - 4 + this.gameService.GridHeight + 4 - yOffset,
+            this.gameService.GridWidth + 8, 2 * GameStatic.bubbleHeight + 3);
+
+
+        this.drawPlayer();
+
     }
 
     private drawBubbles(): void {
@@ -63,6 +68,42 @@ export class GameBoardComponent implements OnInit {
                 }
             }
         }
+    }
+
+    private drawPlayer(): void {
+        // Draw player background circle
+        this.context.fillStyle = "#7a7a7a";
+        this.context.beginPath();
+        this.context.arc(this.gameService.Player.X, this.gameService.Player.Y,
+            GameStatic.radius + 12, 0, 2 * Math.PI, false);
+        this.context.fill();
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = "#8c8c8c";
+        this.context.stroke();
+
+        // Draw the angle
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = "#0000ff";
+        this.context.beginPath();
+        this.context.moveTo(this.gameService.Player.X, this.gameService.Player.Y,);
+        this.context.lineTo(
+            this.gameService.Player.X + 1.5 * GameStatic.bubbleWidth * Math.cos(degToRad(this.gameService.Player.Angle)),
+            this.gameService.Player.Y - 1.5 * GameStatic.bubbleHeight * Math.sin(degToRad(this.gameService.Player.Angle)));
+        this.context.stroke();
+
+        // Draw the next bubble
+        this.drawBubble(
+            this.gameService.Player.NextBubble.X,
+            this.gameService.Player.NextBubble.Y,
+            this.gameService.Player.NextBubble.Color
+        );
+
+        // Draw the current bubble
+        this.drawBubble(
+            this.gameService.Player.Bubble.X,
+            this.gameService.Player.Bubble.Y,
+            this.gameService.Player.Bubble.Color
+        );
     }
 
     private drawBubble( x: number, y: number, index: Color ): void {
