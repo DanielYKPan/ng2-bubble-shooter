@@ -3,9 +3,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Bubble, Color } from './bubble';
-import { Store } from '@ngrx/store';
-import { STORE_BUBBLES, SET_GAME_STATE } from './actions.const';
+import { Bubble } from './bubble';
 
 export const GameStatic = {
     x: 4,           // X position
@@ -27,16 +25,88 @@ const randRange = ( low: number, high: number ): number => {
 @Injectable()
 export class GameService {
 
-    constructor( private store: Store<any> ) {
+    private bubbles: Bubble[][];
+
+    get Bubbles(): Bubble[][] {
+        return this.bubbles;
+    }
+
+    private preLoaded: boolean = false;
+
+    get PreLoaded(): boolean {
+        return this.preLoaded;
+    }
+
+    private images: any;
+
+    private bubbleImage: any;
+
+    get BubbleImage(): any {
+        return this.bubbleImage;
+    }
+
+    constructor() {
+        this.initBubbles();
+        this.images = this.loadImages(['bubble-sprites.png']);
+        this.bubbleImage = this.images[0];
     }
 
     public newGame(): void {
         this.buildGrid();
-        this.initShootBubbles();
+        // this.initShootBubbles();
+    }
+
+    public getBubbleCoordinate( column, row ) {
+        let bubbleX = GameStatic.x + column * GameStatic.bubbleWidth;
+
+        // X offset for odd or even rows
+        if (row % 2) {
+            bubbleX += GameStatic.bubbleWidth / 2;
+        }
+
+        let bubbleY = GameStatic.y + row * GameStatic.rowHeight;
+        return {bubbleX, bubbleY};
+    }
+
+    private loadImages( imageFiles: string[] ) {
+        let loadedImages = [];
+        let loadCount = 0;
+        let loadTotal = imageFiles.length;
+        this.preLoaded = false;
+
+        for (let i = 0; i < imageFiles.length; i++) {
+            let image = new Image();
+
+            // Add onload event handler
+            image.onload = () => {
+                loadCount++;
+                if (loadCount === loadTotal) {
+                    // Done loading
+                    this.preLoaded = true;
+                }
+            };
+
+            // Set the source url of the image
+            image.src = '/assets/img/' + imageFiles[i];
+
+            // Save to the image array
+            loadedImages[i] = image;
+        }
+
+        return loadedImages;
+    }
+
+    private initBubbles(): void {
+        this.bubbles = [];
+        for (let i = 0; i < GameStatic.columns; i++) {
+            this.bubbles[i] = [];
+            for (let j = 0; j < GameStatic.rows; j++) {
+                this.bubbles[i][j] = new Bubble(i, j);
+            }
+        }
     }
 
     private buildGrid(): void {
-        let bubbles: Bubble[] = [];
         for (let j = 0; j < GameStatic.rows / 2; j++) {
             let randomColor = randRange(0, GameStatic.bubbleColors - 1);
             let count = 0;
@@ -51,16 +121,14 @@ export class GameService {
                     count = 0;
                 }
                 count++;
-                let bubble = new Bubble(i, j, randomColor);
-                bubbles.push(bubble);
+                this.bubbles[i][j].Color = randomColor;
             }
         }
-        this.store.dispatch({type: STORE_BUBBLES, payload: {bubbles}});
     }
 
-    private initShootBubbles(): void {
-        let bubble = new Bubble(null, null, randRange(0, GameStatic.bubbleColors - 1));
-        let nextBubble = new Bubble(null, null, randRange(0, GameStatic.bubbleColors - 1));
-        this.store.dispatch({type: SET_GAME_STATE, payload: {bubble, nextBubble}});
-    }
+    /*private initShootBubbles(): void {
+     let bubble = new Bubble(null, null, randRange(0, GameStatic.bubbleColors - 1));
+     let nextBubble = new Bubble(null, null, randRange(0, GameStatic.bubbleColors - 1));
+     this.store.dispatch({type: SET_GAME_STATE, payload: {bubble, nextBubble}});
+     }*/
 }

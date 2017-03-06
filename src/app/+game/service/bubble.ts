@@ -44,10 +44,14 @@ export class Bubble {
         return this.color;
     }
 
-    constructor( x: number, y: number, color: Color ) {
+    set Color( color: Color ) {
+        this.color = color;
+    }
+
+    constructor( x: number, y: number, color?: Color ) {
         this.id = uuid();
         this.x = x;
         this.y = y;
-        this.color = color;
+        this.color = color ? color : null;
     }
 }
