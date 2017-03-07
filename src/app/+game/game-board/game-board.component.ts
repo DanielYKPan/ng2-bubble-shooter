@@ -4,6 +4,7 @@
 
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { GameService, GameStatic, Color, degToRad } from '../service';
+import { GameState } from '../service/game-state.reducer';
 
 @Component({
     selector: 'app-game-board',
@@ -67,6 +68,22 @@ export class GameBoardComponent implements OnInit {
         // Draw player
         this.drawPlayer();
 
+        // Draw Game Over Board
+        if (this.gameService.GameState === GameState.Over) {
+            this.context.fillStyle = "rgba(0, 0, 0, 0.8)";
+            this.context.fillRect(GameStatic.x - 4, GameStatic.y - 4,
+                this.gameService.GridWidth + 8,
+                this.gameService.GridHeight + 2 * GameStatic.bubbleHeight + 8 - yOffset);
+
+            this.context.fillStyle = "#ffffff";
+            this.context.font = "24px Verdana";
+            this.drawCenterText("Game Over!",
+                GameStatic.x, GameStatic.y + this.gameService.GridHeight / 2 + 10,
+                this.gameService.GridWidth);
+            this.drawCenterText("Click to start",
+                GameStatic.x, GameStatic.y + this.gameService.GridHeight / 2 + 40,
+                this.gameService.GridWidth);
+        }
     }
 
     private drawBubbles(): void {
@@ -133,6 +150,12 @@ export class GameBoardComponent implements OnInit {
             this.gameService.BubbleImage,
             index * 40, 0, 40, 40, x, y,
             GameStatic.bubbleWidth, GameStatic.bubbleHeight);
+    }
+
+    private drawCenterText( text: string, x: number, y: number, width: number ): void {
+        let textDim = this.context.measureText(text);
+        this.context.fillText(text, x + (width - textDim.width) / 2, y);
+        return;
     }
 
     private getMousePos( e: MouseEvent ): {x: number, y: number} {

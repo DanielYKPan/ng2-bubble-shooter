@@ -73,6 +73,10 @@ export class GameService {
 
     private gameState: GameState;
 
+    get GameState(): GameState {
+        return this.gameState;
+    }
+
     // Timing and frames per second
     private lastFrame = 0;
     private fpsTime = 0;
@@ -340,6 +344,11 @@ export class GameService {
         if (addBubble) {
             this.player.BubbleVisible = false;
             this.bubbles[gridPos.x][gridPos.y].Color = this.player.Bubble.Color;
+
+            // Check for game over
+            if (this.checkGameOver()) {
+                return;
+            }
         }
 
         this.nextBubble();
@@ -347,6 +356,24 @@ export class GameService {
             type: 'SET_GAME_STATE',
             payload: {gameState: GameState.Ready}
         });
+    }
+
+    private checkGameOver(): boolean {
+        // Check for game over
+        for (let i = 0; i < GameStatic.columns; i++) {
+            // Check if there are bubbles in the bottom row
+            if (this.bubbles[i][GameStatic.rows - 1].Color !== null) {
+                // Game over
+                this.nextBubble();
+                this.store.dispatch({
+                    type: 'SET_GAME_STATE',
+                    payload: {gameState: GameState.Over}
+                });
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // Check if two circles intersect
