@@ -19,6 +19,13 @@ export class Player {
         return this.y;
     }
 
+    /* Property speed */
+    private speed: number;
+
+    get Speed(): number {
+        return this.speed;
+    }
+
     /* Property angle */
     private angle: number;
 
@@ -56,5 +63,6 @@ export class Player {
         this.x = x;
         this.y = y;
         this.angle = angle;
+        this.speed = 1000;
     }
 }
