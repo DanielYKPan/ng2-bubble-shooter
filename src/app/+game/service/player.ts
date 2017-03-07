@@ -26,11 +26,15 @@ export class Player {
         return this.angle;
     }
 
+    set Angle( value: number ) {
+        this.angle = value;
+    }
+
     /* Property bubble */
     private bubble: Bubble;
 
     get Bubble(): Bubble {
-        return this.bubble
+        return this.bubble;
     }
 
     set Bubble( value: Bubble ) {
@@ -41,7 +45,7 @@ export class Player {
     private nextBubble: Bubble;
 
     get NextBubble(): Bubble {
-        return this.nextBubble
+        return this.nextBubble;
     }
 
     set NextBubble( value: Bubble ) {

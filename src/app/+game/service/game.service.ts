@@ -5,6 +5,7 @@
 import { Injectable } from '@angular/core';
 import { Bubble } from './bubble';
 import { Player } from './player';
+import { radToDeg } from './utils';
 
 export const GameStatic = {
     x: 4,           // X position
@@ -27,17 +28,19 @@ const randRange = ( low: number, high: number ): number => {
 export class GameService {
 
     /* Property gridWidth */
-    private gridWidth: number = GameStatic.bubbleWidth * GameStatic.columns + GameStatic.bubbleWidth / 2;
+    private gridWidth: number = GameStatic.bubbleWidth * GameStatic.columns +
+        GameStatic.bubbleWidth / 2;
 
     get GridWidth(): number {
-        return this.gridWidth
+        return this.gridWidth;
     }
 
     /* Property gridHeight */
-    private gridHeight: number = GameStatic.rowHeight * (GameStatic.rows - 1) + GameStatic.bubbleHeight;
+    private gridHeight: number = GameStatic.rowHeight * (GameStatic.rows - 1) +
+        GameStatic.bubbleHeight;
 
     get GridHeight(): number {
-        return this.gridHeight
+        return this.gridHeight;
     }
 
     private bubbles: Bubble[][];
@@ -90,6 +93,35 @@ export class GameService {
         return {bubbleX, bubbleY};
     }
 
+    public setPlayerAngle( mousePos: {x: number; y: number} ) {
+        let mouseAngle = radToDeg(
+            Math.atan2(this.player.Y - mousePos.y, mousePos.x - this.player.X)
+        );
+
+        // Convert range to 0, 360 degrees
+        if (mouseAngle < 0) {
+            mouseAngle = 360 + mouseAngle;
+        }
+
+        // Restrict angle to 8, 172 degrees
+        let lBound = 8;
+        let uBound = 172;
+        if (mouseAngle > 90 && mouseAngle < 270) {
+            // Left
+            if (mouseAngle > uBound) {
+                mouseAngle = uBound;
+            }
+        } else {
+            // Right
+            if (mouseAngle < lBound || mouseAngle >= 270) {
+                mouseAngle = lBound;
+            }
+        }
+
+        // Set the player angle
+        this.player.Angle = mouseAngle;
+    }
+
     private loadImages( imageFiles: string[] ) {
         let loadedImages = [];
         let loadCount = 0;
@@ -134,9 +166,11 @@ export class GameService {
 
         // set the player current bubble
         let randomColor = randRange(0, GameStatic.bubbleColors - 1);
-        console.log(randomColor);
         this.player = new Player(x, y, 90);
-        this.player.Bubble = new Bubble(x - GameStatic.bubbleWidth / 2, y - GameStatic.bubbleHeight / 2, randomColor);
+        this.player.Bubble = new Bubble(
+            x - GameStatic.bubbleWidth / 2,
+            y - GameStatic.bubbleHeight / 2,
+            randomColor);
 
         // set the player next bubble
         randomColor = randRange(0, GameStatic.bubbleColors - 1);

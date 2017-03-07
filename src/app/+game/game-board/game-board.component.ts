@@ -23,6 +23,12 @@ export class GameBoardComponent implements OnInit {
         this.main(0);
     }
 
+    public mouseMove( e: MouseEvent ): void {
+        let pos = this.getMousePos(e);
+        this.gameService.setPlayerAngle(pos);
+        return;
+    }
+
     private main( tframe: number ): void {
         // Request animation frames
         window.requestAnimationFrame(( timestamp ) => this.main(timestamp));
@@ -48,12 +54,12 @@ export class GameBoardComponent implements OnInit {
         this.drawBubbles();
 
         // Draw level bottom
-        this.context.fillStyle = "#656565";
+        this.context.fillStyle = '#656565';
         this.context.fillRect(GameStatic.x - 4,
             GameStatic.y - 4 + this.gameService.GridHeight + 4 - yOffset,
             this.gameService.GridWidth + 8, 2 * GameStatic.bubbleHeight + 3);
 
-
+        // Draw player
         this.drawPlayer();
 
     }
@@ -72,23 +78,25 @@ export class GameBoardComponent implements OnInit {
 
     private drawPlayer(): void {
         // Draw player background circle
-        this.context.fillStyle = "#7a7a7a";
+        this.context.fillStyle = '#7a7a7a';
         this.context.beginPath();
         this.context.arc(this.gameService.Player.X, this.gameService.Player.Y,
             GameStatic.radius + 12, 0, 2 * Math.PI, false);
         this.context.fill();
         this.context.lineWidth = 2;
-        this.context.strokeStyle = "#8c8c8c";
+        this.context.strokeStyle = '#8c8c8c';
         this.context.stroke();
 
         // Draw the angle
         this.context.lineWidth = 2;
-        this.context.strokeStyle = "#0000ff";
+        this.context.strokeStyle = '#0000ff';
         this.context.beginPath();
-        this.context.moveTo(this.gameService.Player.X, this.gameService.Player.Y,);
+        this.context.moveTo(this.gameService.Player.X, this.gameService.Player.Y);
         this.context.lineTo(
-            this.gameService.Player.X + 1.5 * GameStatic.bubbleWidth * Math.cos(degToRad(this.gameService.Player.Angle)),
-            this.gameService.Player.Y - 1.5 * GameStatic.bubbleHeight * Math.sin(degToRad(this.gameService.Player.Angle)));
+            this.gameService.Player.X +
+            1.5 * GameStatic.bubbleWidth * Math.cos(degToRad(this.gameService.Player.Angle)),
+            this.gameService.Player.Y -
+            1.5 * GameStatic.bubbleHeight * Math.sin(degToRad(this.gameService.Player.Angle)));
         this.context.stroke();
 
         // Draw the next bubble
@@ -114,5 +122,15 @@ export class GameBoardComponent implements OnInit {
             this.gameService.BubbleImage,
             index * 40, 0, 40, 40, x, y,
             GameStatic.bubbleWidth, GameStatic.bubbleHeight);
+    }
+
+    private getMousePos( e: MouseEvent ): {x: number, y: number} {
+        let rect = this.board.nativeElement.getBoundingClientRect();
+        return {
+            x: Math.round((e.clientX - rect.left) / (rect.right - rect.left)
+                * this.board.nativeElement.width),
+            y: Math.round((e.clientY - rect.top) / (rect.bottom - rect.top)
+                * this.board.nativeElement.height)
+        };
     }
 }
