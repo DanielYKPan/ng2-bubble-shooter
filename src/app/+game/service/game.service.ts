@@ -69,6 +69,13 @@ export class GameService {
         return this.player;
     }
 
+
+    // Timing and frames per second
+    private lastFrame = 0;
+    private fpsTime = 0;
+    private frameCount = 0;
+    private fps = 0;
+
     constructor() {
         this.initBubbles();
         this.initPlayer();
@@ -120,6 +127,28 @@ export class GameService {
 
         // Set the player angle
         this.player.Angle = mouseAngle;
+    }
+
+    public update( tframe: number ): void {
+        let dt = (tframe - this.lastFrame) / 1000;
+        this.lastFrame = tframe;
+
+        this.updateFps(dt);
+    }
+
+    private updateFps( dt: number ): void {
+        if (this.fpsTime > 0.25) {
+            // Calculate fps
+            this.fps = Math.round(this.frameCount / this.fpsTime);
+
+            // Reset time and framecount
+            this.fpsTime = 0;
+            this.frameCount = 0;
+        }
+
+        // Increase time and framecount
+        this.fpsTime += dt;
+        this.frameCount++;
     }
 
     private loadImages( imageFiles: string[] ) {

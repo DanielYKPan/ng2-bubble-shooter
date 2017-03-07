@@ -33,6 +33,7 @@ export class GameBoardComponent implements OnInit {
         // Request animation frames
         window.requestAnimationFrame(( timestamp ) => this.main(timestamp));
         if (this.gameService.PreLoaded) {
+            this.gameService.update(tframe);
             this.render();
         }
     }
