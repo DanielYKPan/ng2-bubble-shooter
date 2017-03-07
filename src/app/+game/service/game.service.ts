@@ -165,6 +165,8 @@ export class GameService {
 
         if (this.gameState === GameState.ShootBubble) {
             this.stateShootBubble(dt);
+        } else if (this.gameState === GameState.RemoveCluster) {
+            console.log("Remove Cluster");
         }
     }
 
@@ -360,9 +362,11 @@ export class GameService {
 
             if (this.cluster.length >= 3) {
                 // Remove the cluster
-                //setGameState(gamestates.removecluster);
-                //return;
-                console.log("hello");
+                this.store.dispatch({
+                    type: 'SET_GAME_STATE',
+                    payload: {gameState: GameState.RemoveCluster}
+                });
+                return;
             }
         }
 

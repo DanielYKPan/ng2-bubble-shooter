@@ -9,6 +9,7 @@ import { Bubble } from './bubble';
 export enum GameState {
     Ready,
     ShootBubble,
+    RemoveCluster,
     Over,
 }
 
