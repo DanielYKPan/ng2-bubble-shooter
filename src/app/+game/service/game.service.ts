@@ -26,6 +26,10 @@ const randRange = ( low: number, high: number ): number => {
     return Math.floor(low + Math.random() * (high - low + 1));
 };
 
+// Neighbour offset table
+const neighboursOffSets = [[[1, 0], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1]], // Even row tiles
+    [[1, 0], [1, 1], [0, 1], [-1, 0], [0, -1], [1, -1]]];  // Odd row tiles
+
 @Injectable()
 export class GameService {
 
@@ -84,6 +88,8 @@ export class GameService {
     private fps = 0;
 
     private rowOffSet: number = 0;
+
+    private cluster: Bubble[] = [];
 
     constructor( private store: Store<any> ) {
         this.store.select('gameState').subscribe(
@@ -349,6 +355,15 @@ export class GameService {
             if (this.checkGameOver()) {
                 return;
             }
+
+            this.cluster = this.findCluster(gridPos.x, gridPos.y);
+
+            if (this.cluster.length >= 3) {
+                // Remove the cluster
+                //setGameState(gamestates.removecluster);
+                //return;
+                console.log("hello");
+            }
         }
 
         this.nextBubble();
@@ -407,5 +422,60 @@ export class GameService {
         this.player.BubbleVisible = true;
 
         this.player.NextBubble.Color = randRange(0, GameStatic.bubbleColors - 1);
+    }
+
+    private findCluster( bubbleX: number, bubbleY: number ): Bubble[] {
+        let targetBubble = this.bubbles[bubbleX][bubbleY];
+
+        let toProcess = [targetBubble];
+        targetBubble.Processed = true;
+        let foundCluster = [];
+
+        while (toProcess.length > 0) {
+            let currentBubble = toProcess.pop();
+
+            if (currentBubble.Color === null) {
+                continue;
+            }
+
+            if (currentBubble.Color === targetBubble.Color) {
+                foundCluster.push(currentBubble);
+
+                let neighbours: Bubble[] = this.getNeighbours(currentBubble);
+
+                // Check the type of each neighbor
+                for (let i = 0; i < neighbours.length; i++) {
+                    if (!neighbours[i].Processed) {
+                        // Add the neighbour to the toProcess array
+                        toProcess.push(neighbours[i]);
+                        neighbours[i].Processed = true;
+                    }
+                }
+            }
+        }
+
+        return foundCluster;
+    }
+
+    private getNeighbours( currentBubble: Bubble ): Bubble[] {
+        let bubbleRow = (currentBubble.Y + this.rowOffSet) % 2; // Even or odd row
+        let neighbours = [];
+
+        // Get the neighbor offsets for the specified tile
+        let n = neighboursOffSets[bubbleRow];
+
+        // Get the neighbors
+        for (let i = 0; i < n.length; i++) {
+            // Neighbor coordinate
+            let nx = currentBubble.X + n[i][0];
+            let ny = currentBubble.Y + n[i][1];
+
+            // Make sure the tile is valid
+            if (nx >= 0 && nx < GameStatic.columns && ny >= 0 && ny < GameStatic.rows) {
+                neighbours.push(this.bubbles[nx][ny]);
+            }
+        }
+
+        return neighbours;
     }
 }
