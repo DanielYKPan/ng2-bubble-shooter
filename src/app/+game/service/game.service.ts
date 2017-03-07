@@ -5,7 +5,9 @@
 import { Injectable } from '@angular/core';
 import { Bubble } from './bubble';
 import { Player } from './player';
-import { radToDeg } from './utils';
+import { radToDeg, degToRad } from './utils';
+import { Store } from '@ngrx/store';
+import { GameState, IGameState } from './game-state.reducer';
 
 export const GameStatic = {
     x: 4,           // X position
@@ -69,6 +71,7 @@ export class GameService {
         return this.player;
     }
 
+    private gameState: GameState;
 
     // Timing and frames per second
     private lastFrame = 0;
@@ -76,7 +79,12 @@ export class GameService {
     private frameCount = 0;
     private fps = 0;
 
-    constructor() {
+    private rowOffSet: number = 0;
+
+    constructor( private store: Store<any> ) {
+        this.store.select('gameState').subscribe(
+            ( data: IGameState ) => this.gameState = data.gameState
+        );
         this.initBubbles();
         this.initPlayer();
         this.images = this.loadImages(['bubble-sprites.png']);
@@ -92,7 +100,7 @@ export class GameService {
         let bubbleX = GameStatic.x + column * GameStatic.bubbleWidth;
 
         // X offset for odd or even rows
-        if (row % 2) {
+        if ((row + this.rowOffSet) % 2) {
             bubbleX += GameStatic.bubbleWidth / 2;
         }
 
@@ -129,11 +137,25 @@ export class GameService {
         this.player.Angle = mouseAngle;
     }
 
+    public handleMouseDown(): void {
+        if (this.gameState === GameState.Ready) {
+            this.player.BubbleAngle = this.player.Angle;
+            this.store.dispatch({
+                type: 'SET_GAME_STATE',
+                payload: {gameState: GameState.ShootBubble}
+            });
+        }
+    }
+
     public update( tframe: number ): void {
         let dt = (tframe - this.lastFrame) / 1000;
         this.lastFrame = tframe;
 
         this.updateFps(dt);
+
+        if (this.gameState === GameState.ShootBubble) {
+            this.stateShootBubble(dt);
+        }
     }
 
     private updateFps( dt: number ): void {
@@ -200,6 +222,7 @@ export class GameService {
             x - GameStatic.bubbleWidth / 2,
             y - GameStatic.bubbleHeight / 2,
             randomColor);
+        this.player.BubbleVisible = true;
 
         // set the player next bubble
         randomColor = randRange(0, GameStatic.bubbleColors - 1);
@@ -228,9 +251,126 @@ export class GameService {
         }
     }
 
-    /*private initShootBubbles(): void {
-     let bubble = new Bubble(null, null, randRange(0, GameStatic.bubbleColors - 1));
-     let nextBubble = new Bubble(null, null, randRange(0, GameStatic.bubbleColors - 1));
-     this.store.dispatch({type: SET_GAME_STATE, payload: {bubble, nextBubble}});
-     }*/
+    private stateShootBubble( dt: number ) {
+        let x = dt * this.player.Speed * Math.cos(degToRad(this.player.BubbleAngle));
+        let y = dt * this.player.Speed * -1 * Math.sin(degToRad(this.player.BubbleAngle));
+        this.player.Bubble.moveBubble(x, y);
+
+        // Handle left and right collisions with the level
+        if (this.player.Bubble.X <= GameStatic.x) {
+            // Left edge
+            this.player.BubbleAngle = 180 - this.player.BubbleAngle;
+            this.player.Bubble.X = GameStatic.x;
+        } else if (this.player.Bubble.X + GameStatic.bubbleWidth >=
+            GameStatic.x + this.gridWidth) {
+            // Right edge
+            this.player.BubbleAngle = 180 - this.player.BubbleAngle;
+            this.player.Bubble.X = GameStatic.x + this.gridWidth - GameStatic.bubbleWidth;
+        }
+
+        // Collisions with the top of the level
+        if (this.player.Bubble.Y <= GameStatic.y) {
+            // Top collision
+            this.snapBubble();
+            return;
+        }
+
+        for (let i = 0; i < GameStatic.columns; i++) {
+            for (let j = 0; j < GameStatic.rows; j++) {
+                let bubble = this.bubbles[i][j];
+                if (bubble.Color === null) {
+                    continue;
+                }
+
+                // Check for intersections
+                let coord = this.getBubbleCoordinate(i, j);
+                if (this.circleIntersection(this.player.Bubble.X + GameStatic.bubbleWidth / 2,
+                        this.player.Bubble.Y + GameStatic.bubbleHeight / 2,
+                        GameStatic.radius,
+                        coord.bubbleX + GameStatic.bubbleWidth / 2,
+                        coord.bubbleY + GameStatic.bubbleHeight / 2,
+                        GameStatic.radius)) {
+
+                    // Intersection with a level bubble
+                    this.snapBubble();
+                    return;
+                }
+            }
+        }
+    }
+
+    private snapBubble(): void {
+
+        // Get the grid position
+        let centerX = this.player.Bubble.X;
+        let centerY = this.player.Bubble.Y;
+        let gridPos = this.getGridPosition(centerX, centerY);
+
+        // Make sure the grid position is valid
+        if (gridPos.x < 0) {
+            gridPos.x = 0;
+        }
+
+        if (gridPos.x >= GameStatic.columns) {
+            gridPos.x = GameStatic.columns - 1;
+        }
+
+        if (gridPos.y < 0) {
+            gridPos.y = 0;
+        }
+
+        if (gridPos.y >= GameStatic.rows) {
+            gridPos.y = GameStatic.rows - 1;
+        }
+
+        // Check if the bubble is empty
+        let addBubble = false;
+        if (this.bubbles[gridPos.x][gridPos.y].Color >= 0) {
+            // Bubble is not empty, shift the new bubble downwards
+            for (let newRow = gridPos.y + 1; newRow < GameStatic.rows; newRow++) {
+                if (this.bubbles[gridPos.x][newRow].Color === null) {
+                    gridPos.y = newRow;
+                    addBubble = true;
+                    break;
+                }
+            }
+        } else {
+            addBubble = true;
+        }
+
+        if (addBubble) {
+            this.player.BubbleVisible = false;
+            this.bubbles[gridPos.x][gridPos.y].Color = this.player.Bubble.Color;
+        }
+
+
+        this.store.dispatch({
+            type: 'SET_GAME_STATE',
+            payload: {gameState: GameState.Ready}
+        });
+    }
+
+    // Check if two circles intersect
+    private circleIntersection( x1, y1, r1, x2, y2, r2 ): boolean {
+        // Calculate the distance between the centers
+        let dx = x1 - x2;
+        let dy = y1 - y2;
+        let len = Math.sqrt(dx * dx + dy * dy);
+
+        return len < r1 + r2;
+    }
+
+    // Get the closest grid position
+    private getGridPosition( x, y ) {
+        let gridY = Math.floor((y - GameStatic.y) / GameStatic.rowHeight);
+
+        // Check for offset
+        let xOffset = 0;
+        if ((gridY + this.rowOffSet) % 2) {
+            xOffset = GameStatic.bubbleWidth / 2;
+        }
+        let gridX = Math.floor(((x - xOffset) - GameStatic.x) / GameStatic.bubbleWidth);
+
+        return {x: gridX, y: gridY};
+    }
 }

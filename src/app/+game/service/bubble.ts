@@ -30,11 +30,19 @@ export class Bubble {
         return this.x;
     }
 
+    set X( value: number ) {
+        this.x = value;
+    }
+
     /* Property y */
     private y: number;
 
     get Y(): number {
         return this.y;
+    }
+
+    set Y( value: number ) {
+        this.y = value;
     }
 
     /* Property color */
@@ -53,5 +61,10 @@ export class Bubble {
         this.x = x;
         this.y = y;
         this.color = color >= 0 ? color : null;
+    }
+
+    public moveBubble( x: number, y: number ): void {
+        this.x += x;
+        this.y += y;
     }
 }

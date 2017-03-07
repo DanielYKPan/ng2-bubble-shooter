@@ -37,6 +37,28 @@ export class Player {
         this.angle = value;
     }
 
+    /* Property bubbleAngle */
+    private bubbleAngle: number;
+
+    get BubbleAngle(): number {
+        return this.bubbleAngle;
+    }
+
+    set BubbleAngle( value: number ) {
+        this.bubbleAngle = value;
+    }
+
+    /* Property bubbleVisible */
+    private bubbleVisible: boolean;
+
+    get BubbleVisible(): boolean {
+        return this.bubbleVisible;
+    }
+
+    set BubbleVisible( value: boolean ) {
+        this.bubbleVisible = value;
+    }
+
     /* Property bubble */
     private bubble: Bubble;
 
@@ -64,5 +86,6 @@ export class Player {
         this.y = y;
         this.angle = angle;
         this.speed = 1000;
+        this.bubbleVisible = false;
     }
 }

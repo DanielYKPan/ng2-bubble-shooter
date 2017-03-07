@@ -29,6 +29,10 @@ export class GameBoardComponent implements OnInit {
         return;
     }
 
+    public mouseDown( e: MouseEvent ): void {
+        this.gameService.handleMouseDown();
+    }
+
     private main( tframe: number ): void {
         // Request animation frames
         window.requestAnimationFrame(( timestamp ) => this.main(timestamp));
@@ -108,11 +112,13 @@ export class GameBoardComponent implements OnInit {
         );
 
         // Draw the current bubble
-        this.drawBubble(
-            this.gameService.Player.Bubble.X,
-            this.gameService.Player.Bubble.Y,
-            this.gameService.Player.Bubble.Color
-        );
+        if (this.gameService.Player.BubbleVisible) {
+            this.drawBubble(
+                this.gameService.Player.Bubble.X,
+                this.gameService.Player.Bubble.Y,
+                this.gameService.Player.Bubble.Color
+            );
+        }
     }
 
     private drawBubble( x: number, y: number, index: Color ): void {

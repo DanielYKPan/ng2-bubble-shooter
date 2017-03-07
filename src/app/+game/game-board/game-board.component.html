@@ -1,2 +1,4 @@
-<canvas #board class="game-board" width="628" height="628" (mousemove)="mouseMove($event)">
+<canvas #board class="game-board" width="628" height="628"
+        (mousedown)="mouseDown($event)"
+        (mousemove)="mouseMove($event)">
 </canvas>
