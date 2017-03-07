@@ -212,22 +212,19 @@ export class GameService {
     }
 
     private initPlayer(): void {
-        let x = GameStatic.x + this.gridWidth / 2;
-        let y = GameStatic.y + this.gridHeight + GameStatic.bubbleHeight / 2;
+        let x = GameStatic.x + this.gridWidth / 2 - GameStatic.bubbleWidth / 2;
+        let y = GameStatic.y + this.gridHeight;
 
         // set the player current bubble
         let randomColor = randRange(0, GameStatic.bubbleColors - 1);
         this.player = new Player(x, y, 90);
-        this.player.Bubble = new Bubble(
-            x - GameStatic.bubbleWidth / 2,
-            y - GameStatic.bubbleHeight / 2,
-            randomColor);
+        this.player.Bubble = new Bubble(x, y, randomColor);
         this.player.BubbleVisible = true;
 
         // set the player next bubble
         randomColor = randRange(0, GameStatic.bubbleColors - 1);
-        let nextX = x - 3 * GameStatic.bubbleWidth;
-        let nextY = y - GameStatic.bubbleHeight / 2;
+        let nextX = x - 2 * GameStatic.bubbleWidth;
+        let nextY = y;
         this.player.NextBubble = new Bubble(nextX, nextY, randomColor);
     }
 
@@ -343,7 +340,7 @@ export class GameService {
             this.bubbles[gridPos.x][gridPos.y].Color = this.player.Bubble.Color;
         }
 
-
+        this.nextBubble();
         this.store.dispatch({
             type: 'SET_GAME_STATE',
             payload: {gameState: GameState.Ready}
@@ -372,5 +369,14 @@ export class GameService {
         let gridX = Math.floor(((x - xOffset) - GameStatic.x) / GameStatic.bubbleWidth);
 
         return {x: gridX, y: gridY};
+    }
+
+    private nextBubble() {
+        this.player.Bubble.X = this.player.X;
+        this.player.Bubble.Y = this.player.Y;
+        this.player.Bubble.Color = this.player.NextBubble.Color;
+        this.player.BubbleVisible = true;
+
+        this.player.NextBubble.Color = randRange(0, GameStatic.bubbleColors - 1);
     }
 }

@@ -82,10 +82,14 @@ export class GameBoardComponent implements OnInit {
     }
 
     private drawPlayer(): void {
+
+        let centerX = this.gameService.Player.X + GameStatic.bubbleWidth / 2;
+        let centerY = this.gameService.Player.Y + GameStatic.bubbleHeight / 2;
+
         // Draw player background circle
         this.context.fillStyle = '#7a7a7a';
         this.context.beginPath();
-        this.context.arc(this.gameService.Player.X, this.gameService.Player.Y,
+        this.context.arc(centerX, centerY,
             GameStatic.radius + 12, 0, 2 * Math.PI, false);
         this.context.fill();
         this.context.lineWidth = 2;
@@ -96,11 +100,11 @@ export class GameBoardComponent implements OnInit {
         this.context.lineWidth = 2;
         this.context.strokeStyle = '#0000ff';
         this.context.beginPath();
-        this.context.moveTo(this.gameService.Player.X, this.gameService.Player.Y);
+        this.context.moveTo(centerX, centerY);
         this.context.lineTo(
-            this.gameService.Player.X +
+            centerX +
             1.5 * GameStatic.bubbleWidth * Math.cos(degToRad(this.gameService.Player.Angle)),
-            this.gameService.Player.Y -
+            centerY -
             1.5 * GameStatic.bubbleHeight * Math.sin(degToRad(this.gameService.Player.Angle)));
         this.context.stroke();
 
