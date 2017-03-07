@@ -268,6 +268,7 @@ export class GameService {
         // Collisions with the top of the level
         if (this.player.Bubble.Y <= GameStatic.y) {
             // Top collision
+            this.player.Bubble.Y = GameStatic.y;
             this.snapBubble();
             return;
         }
@@ -281,7 +282,8 @@ export class GameService {
 
                 // Check for intersections
                 let coord = this.getBubbleCoordinate(i, j);
-                if (this.circleIntersection(this.player.Bubble.X + GameStatic.bubbleWidth / 2,
+                if (this.circleIntersection(
+                        this.player.Bubble.X + GameStatic.bubbleWidth / 2,
                         this.player.Bubble.Y + GameStatic.bubbleHeight / 2,
                         GameStatic.radius,
                         coord.bubbleX + GameStatic.bubbleWidth / 2,
@@ -299,8 +301,8 @@ export class GameService {
     private snapBubble(): void {
 
         // Get the grid position
-        let centerX = this.player.Bubble.X;
-        let centerY = this.player.Bubble.Y;
+        let centerX = this.player.Bubble.X + GameStatic.bubbleWidth / 2;
+        let centerY = this.player.Bubble.Y + GameStatic.bubbleHeight / 2;
         let gridPos = this.getGridPosition(centerX, centerY);
 
         // Make sure the grid position is valid
@@ -322,7 +324,7 @@ export class GameService {
 
         // Check if the bubble is empty
         let addBubble = false;
-        if (this.bubbles[gridPos.x][gridPos.y].Color >= 0) {
+        if (this.bubbles[gridPos.x][gridPos.y].Color !== null) {
             // Bubble is not empty, shift the new bubble downwards
             for (let newRow = gridPos.y + 1; newRow < GameStatic.rows; newRow++) {
                 if (this.bubbles[gridPos.x][newRow].Color === null) {
