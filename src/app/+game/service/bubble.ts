@@ -56,11 +56,23 @@ export class Bubble {
         this.color = color;
     }
 
+    /* Property processed */
+    private processed: boolean;
+
+    get Processed(): boolean {
+        return this.processed;
+    }
+
+    set Processed( value: boolean ) {
+        this.processed = value;
+    }
+
     constructor( x: number, y: number, color?: Color ) {
         this.id = uuid();
         this.x = x;
         this.y = y;
         this.color = color >= 0 ? color : null;
+        this.processed = false;
     }
 
     public moveBubble( x: number, y: number ): void {
