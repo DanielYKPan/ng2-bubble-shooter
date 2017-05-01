@@ -166,7 +166,7 @@ export class GameService {
         if (this.gameState === GameState.ShootBubble) {
             this.stateShootBubble(dt);
         } else if (this.gameState === GameState.RemoveCluster) {
-            console.log("Remove Cluster");
+            this.stateRemoveCluster(dt);
         }
     }
 
@@ -310,6 +310,10 @@ export class GameService {
         }
     }
 
+    private stateRemoveCluster( dt: number ) {
+
+    }
+
     private snapBubble(): void {
 
         // Get the grid position
@@ -448,11 +452,10 @@ export class GameService {
                 let neighbours: Bubble[] = this.getNeighbours(currentBubble);
 
                 // Check the type of each neighbor
-                for (let i = 0; i < neighbours.length; i++) {
-                    if (!neighbours[i].Processed) {
-                        // Add the neighbour to the toProcess array
-                        toProcess.push(neighbours[i]);
-                        neighbours[i].Processed = true;
+                for (let n of neighbours) {
+                    if (!n.Processed) {
+                        toProcess.push(n);
+                        n.Processed = true;
                     }
                 }
             }

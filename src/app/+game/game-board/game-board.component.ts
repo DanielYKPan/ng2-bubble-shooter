@@ -70,17 +70,17 @@ export class GameBoardComponent implements OnInit {
 
         // Draw Game Over Board
         if (this.gameService.GameState === GameState.Over) {
-            this.context.fillStyle = "rgba(0, 0, 0, 0.8)";
+            this.context.fillStyle = 'rgba(0, 0, 0, 0.8)';
             this.context.fillRect(GameStatic.x - 4, GameStatic.y - 4,
                 this.gameService.GridWidth + 8,
                 this.gameService.GridHeight + 2 * GameStatic.bubbleHeight + 8 - yOffset);
 
-            this.context.fillStyle = "#ffffff";
-            this.context.font = "24px Verdana";
-            this.drawCenterText("Game Over!",
+            this.context.fillStyle = '#ffffff';
+            this.context.font = '24px Verdana';
+            this.drawCenterText('Game Over!',
                 GameStatic.x, GameStatic.y + this.gameService.GridHeight / 2 + 10,
                 this.gameService.GridWidth);
-            this.drawCenterText("Click to start",
+            this.drawCenterText('Click to start',
                 GameStatic.x, GameStatic.y + this.gameService.GridHeight / 2 + 40,
                 this.gameService.GridWidth);
         }
